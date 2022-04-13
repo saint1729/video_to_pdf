@@ -1,8 +1,8 @@
 import os
 import time
 
-from flask import Flask, render_template, request, send_file, url_for
-from werkzeug.utils import secure_filename, redirect
+from flask import Flask, render_template, request, send_file
+
 import video_to_pdf
 
 app = Flask(__name__)
@@ -33,22 +33,6 @@ def upload_file():
         output_pdf_name = os.path.splitext(video_file.filename)[0] + ".pdf"
 
         return send_file(server_pdf_name, download_name=output_pdf_name, as_attachment=True)
-
-
-@app.route('/display', methods=['GET', 'POST'])
-def save_file():
-    if request.method == 'POST':
-        f = request.files['file']
-        filename = secure_filename(f.filename)
-
-        f.save(app.config['UPLOAD_FOLDER'] + filename)
-
-        vf = app.config['UPLOAD_FOLDER'] + filename
-        method = 1
-        video_to_pdf.all_in_one(vf, method)
-        vtt, pdf_name = video_to_pdf.get_vtt_and_pdf_file_path(vf,  method=method)
-
-    return send_file(pdf_name, as_attachment=True)
 
 
 if __name__ == '__main__':
